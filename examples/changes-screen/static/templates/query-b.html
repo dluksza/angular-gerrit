@@ -1,0 +1,52 @@
+<div class="screen">
+  <div class="screenHeader">
+    Search for {{query}}
+  </div>
+  <div class="table-responsive">
+    <table class="table table-bordered">
+      <tr>
+        <th></th>
+        <th></th>
+        <th class="col-sm-3">Subject</th>
+        <th>Status</th>
+        <th class="col-sm-2">Owner</th>
+        <th class="col-sm-3">Project</th>
+        <th class="col-sm-2">Branch</th>
+        <th>Updated</th>
+        <th>Size</th>
+        <td ng-repeat="label in labels" title="{{label}}">{{formatLabel(label)}}</td>
+      </tr>
+      <tr ng-hide="changes.length"><td colspan="{{9 + labels.length}}" class="emptySection">(None)</td></tr>
+      <tr ng-repeat="c in changes" ng-click="highlightRow(c)" ng-class="{active: active.id == c.id}">
+      <td class="iconCell leftMostCell">
+        <span ng-if="active.id == c.id" class="glyphicon glyphicon-play"></span>
+      </td>
+      <td class="iconCell" ng-click="flipStar(c)">
+        <span class="glyphicon glyphicon-star" ng-if="c.starred"></span>
+        <span class="glyphicon glyphicon-star-empty"ng-if="!c.starred"></span>
+      </td>
+      <td class="dataCell cSUBJECT">
+        <a class="gwt-InlineHyperlink" href="#/c/{{c._number}}/">{{c.subject}}</a>
+      </td>
+      <td class="dataCell cSTATUS">{{formatStatus(c.status)}}</td>
+      <td class="dataCell cOWNEWR">
+        <a class="gwt-InlineHyperlink" href="#/x/{{pluginName}}/q-b/owner:%22{{toUrlParameter(c.owner.name)}}%22+status:open" title="{{c.owner.name}}">
+          {{c.owner.name}}
+        </a>
+      </td>
+      <td class="dataCell">
+        <a class="gwt-InlineHyperlink" href="#/x/{{pluginName}}/q-b/status:open+project:{{c.project}}">{{c.project}}</a>
+      </td>
+      <td class="dataCell">
+        <a class="gwt-InlineHyperlink" href="#/x/{{pluginName}}/q-b/status:open+project:{{c.project}}+branch:{{c.branch}}">
+          {{c.branch}}
+        </a>
+      </td>
+      <td class="dataCell cLastUpdate">{{formatUpdatedDate(c.updated)}}</td>
+      <td class="dataCell cSIZE">+{{c.insertions}}, -{{c.deletions}}</div></td>
+      <td ng-repeat="label in labels" class="dataCell cAPPROVAL singleLine"
+          ng-class="{true: 'posscore', false: 'negscore'}[c.labels[label].value > 0]">{{toLabelScore(c.labels[label].value)}}</td>
+    </tr>
+    </table>
+  </div>
+</div>

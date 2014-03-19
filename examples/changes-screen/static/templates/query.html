@@ -1,0 +1,54 @@
+<div class="screen">
+  <div class="screenHeader">
+    Search for {{query}}
+  </div>
+  <table class="changeTable" style="width:100%">
+    <tr>
+      <td class="iconHeader"></td>
+      <td class="iconHeader"></td>
+      <td class="dataHeader">Subject</td>
+      <td class="dataHeader">Status</td>
+      <td class="dataHeader">Owner</td>
+      <td class="dataHeader">Project</td>
+      <td class="dataHeader">Branch</td>
+      <td class="dataHeader">Updated</td>
+      <td class="dataHeader">Size</td>
+      <td ng-repeat="label in labels" class="dataHeader" title="{{label}}">{{formatLabel(label)}}</td>
+    </tr>
+    <tr ng-hide="changes.length"><td colspan="{{9 + labels.length}}" class="emptySection">(None)</td></tr>
+    <tr ng-repeat="c in changes" ng-click="highlightRow(c)" ng-class="{activeRow: active.id == c.id}">
+      <td class="iconCell leftMostCell">
+        <img width="12" height="9"
+             ng-if="active.id == c.id"
+             src="data:image/gif;base64,R0lGODlhDAAJAKIEAP39/fX19fn5+QAAAAAAAAAAAAAAAAAAACH5BAEAAAQALAAAAAAMAAkAAAMTSEq37qc9GOeK1eL8tmXcFIpWAgA7" >
+      </td>
+      <td class="iconCell" ng-click="flipStar(c)">
+        <img width="15" height="15"
+             src="data:image/gif;base64,R0lGODlhDwAPALMAAGho4ZeX6/72D1tXUPfwMq2nZNPMYTAwyxoZl1xZnZGLM9PKDpiUkLi48+XbBP///yH5BAEAAA8ALAAAAAAPAA8AAARY8MlJqw0nWHvY2VSTCEkDSgAjKIAFHPBhCEt8tM9REDwhCD0FQhJAKH5IgUOokTQOg6RjcDBVDr7fAmGlBEYLxWKKowAKiwFiEP5c1S3Aelh5NR+Y8skSAQA7" ng-if="c.starred" >
+        <img width="15" height="15"
+             src="data:image/gif;base64,R0lGODlhDwAPALMPAP///8zj++r7/7vb/rHW/tPt/9Lk+qzT/rbY/sHh/8Te/N7q+Nzy/7nY/djn+f///yH5BAEAAA8ALAAAAAAPAA8AAARg8MkZjpo4k0KyNwlQBB42MICAfEF7APDRBsYzIEkewGKeDI1DgUckMg6GTdFIqC0QgyUgQVhgGkOi4OBBCJYdzILAywIGNcoOgCAQvowBRpE4kgzCQgPjQCAcEwsNTRIRADs=" ng-if="!c.starred" >
+      </td>
+      <td class="dataCell cSUBJECT">
+        <a class="gwt-InlineHyperlink" href="#/c/{{c._number}}/">{{c.subject}}</a>
+      </td>
+      <td class="dataCell cSTATUS">{{formatStatus(c.status)}}</td>
+      <td class="dataCell cOWNEWR">
+        <a class="gwt-InlineHyperlink" href="#/x/{{pluginName}}/q/owner:%22{{toUrlParameter(c.owner.name)}}%22+status:open" title="{{c.owner.name}}">
+          {{c.owner.name}}
+        </a>
+      </td>
+      <td class="dataCell">
+        <a class="gwt-InlineHyperlink" href="#/x/{{pluginName}}/q/status:open+project:{{c.project}}">{{c.project}}</a>
+      </td>
+      <td class="dataCell">
+        <a class="gwt-InlineHyperlink" href="#/x/{{pluginName}}/q/status:open+project:{{c.project}}+branch:{{c.branch}}">
+          {{c.branch}}
+        </a>
+      </td>
+      <td class="dataCell cLastUpdate">{{formatUpdatedDate(c.updated)}}</td>
+      <td class="dataCell cSIZE">+{{c.insertions}}, -{{c.deletions}}</div></td>
+      <td ng-repeat="label in labels" class="dataCell cAPPROVAL singleLine"
+          ng-class="{true: 'posscore', false: 'negscore'}[c.labels[label].value > 0]">{{toLabelScore(c.labels[label].value)}}</td>
+    </tr>
+  </table>
+</div>
