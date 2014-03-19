@@ -67,9 +67,9 @@ In `examples/` directory you will also find more complex example that mimick Ger
 
 New plugins will be available under following links:
 
- * http://<gerrit_host>/#/x/hello-world/ - the hello world plugin example
- * http://<gerrit_host>/#/x/change-screen/q/ - Gerrit ChangesScreen reimplemented with AngularJS
- * http://<gerrit_host>/#/x/change-screen/q-b/ - Gerrit ChangesScreen reimplemented with AngularJS and Bootstrap
+ * http://$gerrit_host/#/x/hello-world/ - the hello world plugin example
+ * http://$gerrit_host/#/x/change-screen/q/ - Gerrit ChangesScreen reimplemented with AngularJS
+ * http://$gerrit_host/#/x/change-screen/q-b/ - Gerrit ChangesScreen reimplemented with AngularJS and Bootstrap
 
 ### Angular Services ###
 
