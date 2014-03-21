@@ -36,19 +36,6 @@ var _initAngularGerrit = function(self) {
   var _addjustUrl = function(url) {
     return (url.charAt(0)=='/' ? url.substring(1) : url);
   }
-  var _wrap = function(promise) {
-    promise.success = function(fn) {
-      promise.then(function(resp) {
-        fn(resp.data, resp.status, resp.headers)
-      })
-    }
-    promise.error = function(fn) {
-      prmoise.then(null, function(resp) {
-        fn(resp.data, resp.status, resp.headers)
-      })
-    }
-    return promise;
-  }
 
   // catch all screen requests in our context
   self.screen(/.*/, function(scrCtx) {
@@ -96,111 +83,6 @@ var _initAngularGerrit = function(self) {
       }
       this['__proto__'].when(path, route);
       return this;
-    }
-  }]);
-
-  /**
-   * Wraps generic Gerrit serivce. There is NO plugin context here!
-   * For plugin context aware service use GerritPluginSrv.
-   *
-   * This service simplifies usage of global Gerrit REST services
-   * (and not only that) automatically wraps all calls into
-   * Angular promise object.
-   */
-  module.service('GerritSrv', ['$q', '$rootScope', function($q, $rootScope) {
-    return {
-      /**
-       * Wrapper arround https://gerrit-review.googlesource.com/Documentation/js-api.html#Gerrit_go
-       */
-      go: function(url) {
-        Gerrit.go(url)
-      },
-
-      /**
-       * Wrapper arround https://gerrit-review.googlesource.com/Documentation/js-api.html#Gerrit_refresh
-       */
-      refresh: function() {
-        Gerrit.refresh()
-      },
-
-      /**
-       * Wrapper arround https://gerrit-review.googlesource.com/Documentation/js-api.html#Gerrit_showError
-       */
-      showError: function(errorMsg) {
-        Gerrit.showError(errorMsg)
-      },
-
-      /**
-       * Wrapper arround https://gerrit-review.googlesource.com/Documentation/js-api.html#Gerrit_onAction
-       *
-       * Callback function is called in $rootScope.$apply context
-       */
-      onAction: function(event, view, fn) {
-        Gerrit.onAction(event, view, function(a, b) {
-          $rootScope.$apply(function() {
-            fn(a, b)
-          })
-        })
-      },
-
-      /**
-       * Wrapper arround https://gerrit-review.googlesource.com/Documentation/js-api.html#Gerrit_url
-       */
-      url: function(url) {
-        return Gerrit.url(url);
-      },
-
-      /**
-       * Wrapper arround https://gerrit-review.googlesource.com/Documentation/js-api.html#Gerrit_get
-       *
-       * Returns Angular promise object with success and error methods mimics $http behavior
-       */
-      get: function(url) {
-        var promise = $q.defer();
-        Gerrit.get(url, function(result) {
-          promise.resolve(result)
-        });
-        return _wrap(promise.promise);
-      },
-
-      /**
-       * Wrapper arround https://gerrit-review.googlesource.com/Documentation/js-api.html#Gerrit_post
-       *
-       * Returns Angular promise object with success and error methods mimics $http behavior
-       */
-      post: function(url, payload) {
-        var promise = $q.defer();
-        Gerrit.post(url, payload, function(result) {
-          promise.resolve(result)
-        });
-        return _wrap(promise.promise);
-      },
-
-      /**
-       * Wrapper arround https://gerrit-review.googlesource.com/Documentation/js-api.html#Gerrit_put
-       *
-       * Returns Angular promise object with success and error methods mimics $http behavior
-       */
-      put: function(url, payload) {
-        var promise = $q.defer();
-        Gerrit.put(url, payload, function(result) {
-          promise.resolve(result)
-        });
-        return _wrap(promise.promise);
-      },
-
-      /**
-       * Wrapper arround https://gerrit-review.googlesource.com/Documentation/js-api.html#Gerrit_delete
-       *
-       * Returns Angular promise object with success and error methods mimics $http behavior
-       */
-      'delete': function(url) {
-        var promise = $q.defer();
-        Gerrit.del(url, function(result) {
-          promise.resolve(result)
-        });
-        return _wrap(promise.promise);
-      },
     }
   }]);
 
@@ -336,11 +218,26 @@ var _namespaceInjections = function(moduleName, impl) {
     }
   }, namespaced);
   return namespaced;
-}
+};
+
+var _wrap = function(promise) {
+  promise.success = function(fn) {
+    promise.then(function(resp) {
+      fn(resp.data, resp.status, resp.headers)
+    });
+  }
+  promise.error = function(fn) {
+    prmoise.then(null, function(resp) {
+      fn(resp.data, resp.status, resp.headers)
+    });
+  }
+  return promise;
+};
 
 if (!window['AngularGerrit']) {
   var _availablePlugins = [];
   var _installedPlugins = [];
+  var _gerritModule = 'angular-gerrit';
   var Module = function (app) {
     this['__proto__'] = app;
     var toOverride = ['controller', 'directive', 'factory', 'filter', 'provider', 'service'];
@@ -380,12 +277,119 @@ if (!window['AngularGerrit']) {
     // this could result in some race conditions, but I haven't found better
     // solution how to initialize multiple Angular modules dynamically
     setTimeout(function() {
+      additionalModules.push(_gerritModule);
       additionalModules.push(moduleName);
       var app = new Module(angular.module(pluginName, additionalModules));
       pluginCallback(app);
       _bootstrap(pluginName);
     }, 1);
   };
+
+  angular.module(_gerritModule, [])
+    /**
+     * Wraps generic Gerrit serivce. There is NO plugin context here!
+     * For plugin context aware service use GerritPluginSrv.
+     *
+     * This service simplifies usage of global Gerrit REST services
+     * (and not only that) automatically wraps all calls into
+     * Angular promise object.
+     */
+    .service('GerritSrv', ['$q', '$rootScope', function($q, $rootScope) {
+      return {
+        /**
+         * Wrapper arround https://gerrit-review.googlesource.com/Documentation/js-api.html#Gerrit_go
+         */
+        go: function(url) {
+          Gerrit.go(url)
+        },
+
+        /**
+         * Wrapper arround https://gerrit-review.googlesource.com/Documentation/js-api.html#Gerrit_refresh
+         */
+        refresh: function() {
+          Gerrit.refresh()
+        },
+
+        /**
+         * Wrapper arround https://gerrit-review.googlesource.com/Documentation/js-api.html#Gerrit_showError
+         */
+        showError: function(errorMsg) {
+          Gerrit.showError(errorMsg)
+        },
+
+        /**
+         * Wrapper arround https://gerrit-review.googlesource.com/Documentation/js-api.html#Gerrit_onAction
+         *
+         * Callback function is called in $rootScope.$apply context
+         */
+        onAction: function(event, view, fn) {
+          Gerrit.onAction(event, view, function(a, b) {
+            $rootScope.$apply(function() {
+              fn(a, b)
+            })
+          })
+        },
+
+        /**
+         * Wrapper arround https://gerrit-review.googlesource.com/Documentation/js-api.html#Gerrit_url
+         */
+        url: function(url) {
+          return Gerrit.url(url);
+        },
+
+        /**
+         * Wrapper arround https://gerrit-review.googlesource.com/Documentation/js-api.html#Gerrit_get
+         *
+         * Returns Angular promise object with success and error methods mimics $http behavior
+         */
+        get: function(url) {
+          var promise = $q.defer();
+          Gerrit.get(url, function(result) {
+            promise.resolve(result)
+          });
+          return _wrap(promise.promise);
+        },
+
+        /**
+         * Wrapper arround https://gerrit-review.googlesource.com/Documentation/js-api.html#Gerrit_post
+         *
+         * Returns Angular promise object with success and error methods mimics $http behavior
+         */
+        post: function(url, payload) {
+          var promise = $q.defer();
+          Gerrit.post(url, payload, function(result) {
+            promise.resolve(result)
+          });
+          return _wrap(promise.promise);
+        },
+
+        /**
+         * Wrapper arround https://gerrit-review.googlesource.com/Documentation/js-api.html#Gerrit_put
+         *
+         * Returns Angular promise object with success and error methods mimics $http behavior
+         */
+        put: function(url, payload) {
+          var promise = $q.defer();
+          Gerrit.put(url, payload, function(result) {
+            promise.resolve(result)
+          });
+          return _wrap(promise.promise);
+        },
+
+        /**
+         * Wrapper arround https://gerrit-review.googlesource.com/Documentation/js-api.html#Gerrit_delete
+         *
+         * Returns Angular promise object with success and error methods mimics $http behavior
+         */
+        'delete': function(url) {
+          var promise = $q.defer();
+          Gerrit.del(url, function(result) {
+            promise.resolve(result)
+          });
+          return _wrap(promise.promise);
+        },
+      }
+    }]);
 
   window['AngularGerrit'] = {
     /**
