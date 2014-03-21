@@ -71,16 +71,21 @@ var _initAngularGerrit = function(self) {
   module.provider('GerritRoute', ['$routeProvider', function($routeProvider) {
     var urlPrefix = '/x/' + _pluginName + '/';
     var templatePrefix = '/plugins/' + _pluginName + '/static/';
-    this.prototype = $routeProvider;
+    this['__proto__'] = $routeProvider;
     this.when = function(path, route) { // addjust template url
       if (route.templateUrl && route.templateUrl.indexOf(templatePrefix) == -1) {
         route.templateUrl = templatePrefix + _addjustUrl(route.templateUrl);
       }
-      if (path.indexOf(urlPrefix) == -1) {
+      if (!path) {
+        path = urlPrefix;
+      } else if (path.indexOf(urlPrefix) == -1) {
         path = urlPrefix + _addjustUrl(path);
       }
       if (route.controller) {
         route.controller = _makeNamespaced(route.controller);
+      }
+      if (route.redirectTo && route.redirectTo.indexOf(urlPrefix) == -1) {
+        route.redirectTo = urlPrefix + _addjustUrl(route.redirectTo);
       }
       if (route.resolve) {
         angular.forEach(route.resolve, function(value, key) {
@@ -89,10 +94,9 @@ var _initAngularGerrit = function(self) {
           this[key] = value;
         }, route.resolve)
       }
-      this.prototype.when(path, route);
+      this['__proto__'].when(path, route);
       return this;
     }
-    this.$get = this.prototype.$get;
   }]);
 
   /**
