@@ -30,7 +30,8 @@ app.config(['GerritRouteProvider', function(GerritRouteProvider) {
                               return GerritSrv.get('/changes/?q=status:open');
                             }
                           },
-                          templateUrl: 'templates/query-b.html'});
+                          templateUrl: 'templates/query-b.html'})
+  .otherwise({ redirectTo: 'q/' });
 }]);
 
 app.controller('QueryCtrl', function($scope, $routeParams, $filter, GerritSrv,
