@@ -45,7 +45,7 @@ var _initAngularGerrit = function(self) {
     scrCtx.show();
   });
 
-  var module = angular.module(_moduleName, ['ng', 'ngRoute']);
+  var module = angular.module(_moduleName, ['ngRoute']);
 
   /**
    * Provide Gerrit plugin context aware route service.
