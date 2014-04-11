@@ -8,7 +8,7 @@ Angular-Gerrit enables you to write [AngularJS](http://angularjs.org) based clie
 
 ## Getting started ##
 
-Clone this repo then run `fetch-deps.sh` and copy files from `src/`:
+Clone this repo then run `bower install` and copy files from `src/`:
 
  * init.js
  * js/angular-gerrit.js

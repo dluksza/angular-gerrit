@@ -1,0 +1,16 @@
+{
+  "name": "angular-gerrit",
+  "version": "0.0.0",
+  "main": "src/js/angular-gerrit.js",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "components"
+  ],
+  "dependencies": {
+    "angular": "1.2.16",
+    "angular-route": "1.2.16",
+    "bootstrap": "3.1.1",
+    "jquery": "1.10.2"
+  }
+}

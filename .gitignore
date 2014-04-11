@@ -1,7 +1,2 @@
 *.jar
-fonts/*.eot
-fonts/*.svg
-fonts/*.ttf
-fonts/*.woff
-src/dist/*.js
-src/dist/*.css
+/bower_components/
