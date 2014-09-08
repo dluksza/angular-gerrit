@@ -4,7 +4,7 @@
 
 Angular-Gerrit enables you to write [AngularJS](http://angularjs.org) based client side plugins for [Gerrit Code Review](https://code.google.com/p/gerrit/).
 
-**Additional** patches on top of current Gerrit master are **required**! The easiest way to get started is to fetch change #[53341](https://gerrit-review.googlesource.com/#/c/53341) and build it locally.
+**Additional** patch on top of current Gerrit master is **required**! The easiest way to get started is to fetch change #[59886](https://gerrit-review.googlesource.com/#/c/59886/) and build it locally.
 
 ## Getting started ##
 
